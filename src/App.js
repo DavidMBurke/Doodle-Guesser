@@ -1,11 +1,11 @@
 import "./Style.css";
-import React, { useEffect, useRef } from "react";
 import mushroom1000 from "./doodles/mushroom1000.bin";
 import helicopter1000 from "./doodles/helicopter1000.bin";
 import octopus1000 from "./doodles/octopus1000.bin";
 import penguin1000 from "./doodles/penguin1000.bin";
 import snail1000 from "./doodles/snail1000.bin";
 import NeuralNetwork from "./neuralNet";
+import Canvas from "./Canvas"
 
 const MUSHROOM = 0;
 const HELICOPTER = 1;
@@ -52,12 +52,6 @@ function App() {
   let testing = [];
   let generations = 0;
 
-  // for (let i = 0; i < 3; i++) {
-  //   trainingGeneration(training);
-  //   console.log("generation", i + 1);
-  //   testAll(testing);
-  // }
-
   return (
     <div className="App">
       <button
@@ -100,54 +94,11 @@ function App() {
       >
         Test
       </button>
-      <Canvas id="Canvas" />
+      <Canvas id="Canvas"/>
     </div>
   );
 }
 
-function Canvas() {
-  const canvasRef = useRef(null);
-  const contextRef = useRef(null);
-  const width = 280;
-  const height = 280;
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    canvas.width = width;
-    canvas.height = height;
-    canvas.style.width = width;
-    canvas.style.height = height;
-
-    const context = canvas.getContext("2d");
-    context.scale(1, 1);
-    context.lineCap = "butt";
-    context.strokeStyle = "black";
-    context.lineWidth = 1;
-    contextRef.current = context;
-
-    for (let i = 0; i < 280; i++) {
-      for (let j = 0; j < 280; j++) {
-        drawPixel("white", contextRef.current, i, j);
-      }
-    }
-
-    // ACTIVATE THIS TO TEST DATA DRAWINGS ARE IMPORTING CORRECTLY
-    // for (let n = 0; n < 100; n++) {
-    //   let o = n * imgSize;
-    //   for (let i = 0; i < 28; i++) {
-    //     for (let j = 0; j < 28; j++) {
-    //       let val = 255 - mushroomData.bytes[o];
-    //       let x = 1 + i + (n % 10) * 28;
-    //       let y = 1 + j + Math.floor(n / 10) * 28;
-    //       drawPixel(`rgb(${val}, ${val}, ${val})`, contextRef.current, y, x);
-    //       o++;
-    //     }
-    //   }
-    // }
-
-  }, []);
-  return <canvas id="learningCanvas" ref={canvasRef} />;
-}
 
 function trainingGeneration(training) {
   shuffle(training);
@@ -192,10 +143,6 @@ function shuffle(array) {
   return array;
 }
 
-function drawPixel(color, canvas, x, y) {
-  canvas.fillStyle = color;
-  canvas.fillRect(x, y, 1, 1);
-}
 
 function loadBytes(file) {
   let data = {};
