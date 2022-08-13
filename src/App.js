@@ -1,11 +1,12 @@
 import "./Style.css";
-import mushroom1000 from "./doodles/mushroom1000.bin";
-import helicopter1000 from "./doodles/helicopter1000.bin";
-import octopus1000 from "./doodles/octopus1000.bin";
-import penguin1000 from "./doodles/penguin1000.bin";
-import snail1000 from "./doodles/snail1000.bin";
+import React, { useState } from "react";
+import mushroom1000 from "./doodles/mushroom10000.bin";
+import helicopter1000 from "./doodles/helicopter10000.bin";
+import octopus1000 from "./doodles/octopus10000.bin";
+import penguin1000 from "./doodles/penguin10000.bin";
+import snail1000 from "./doodles/snail10000.bin";
 import NeuralNetwork from "./neuralNet";
-import Canvas from "./Canvas"
+import Canvas from "./Canvas";
 
 const MUSHROOM = 0;
 const HELICOPTER = 1;
@@ -14,7 +15,7 @@ const PENGUIN = 3;
 const SNAIL = 4;
 
 const imgSize = 784;
-const imgsPerSet = 1000;
+const imgsPerSet = 10000;
 
 let mushroomData;
 let helicopterData;
@@ -45,23 +46,24 @@ penguins.training = [];
 penguins.testing = [];
 snails.training = [];
 snails.testing = [];
+let training = [];
+let testing = [];
+nn = new NeuralNetwork(784, 32, 5);
 
 function App() {
-  nn = new NeuralNetwork(784, 32, 5);
-  let training = [];
-  let testing = [];
-  let generations = 0;
+  const [drawingData, setDrawingData] = useState([]);
 
   return (
     <div className="App">
       <button
         onClick={() => {
+          if (training.length) {return};
           prepareData(mushrooms, mushroomData, MUSHROOM);
           prepareData(helicopters, helicopterData, HELICOPTER);
           prepareData(octopuses, octopusData, OCTOPUS);
           prepareData(penguins, penguinData, PENGUIN);
           prepareData(snails, snailData, SNAIL);
-          console.log(mushrooms, helicopters, octopuses, penguins, snails);
+          console.log("Training data loaded!");
           training = training.concat(mushrooms.training);
           training = training.concat(penguins.training);
           training = training.concat(octopuses.training);
@@ -81,8 +83,7 @@ function App() {
       <button
         onClick={() => {
           trainingGeneration(training);
-          generations++;
-          console.log("Trained for " + generations + " generations.")
+          console.log("Trained for a generation!");
         }}
       >
         Train for One Generation
@@ -94,13 +95,23 @@ function App() {
       >
         Test
       </button>
-      <Canvas id="Canvas"/>
+      <button
+        onClick={() => {
+          guess(drawingData);
+        }}
+      >
+        Guess
+      </button>
+      <Canvas id="Canvas" setDrawingData={setDrawingData} training={training}/>
     </div>
   );
 }
 
-
 function trainingGeneration(training) {
+  if (training.length === 0) {
+    console.log("No training data!");
+    return;
+  }
   shuffle(training);
   for (let i = 0; i < training.length; i++) {
     let data = training[i];
@@ -109,6 +120,32 @@ function trainingGeneration(training) {
     let targets = [0, 0, 0, 0, 0];
     targets[label] = 1;
     nn.train(inputs, targets);
+    if ((i + 1) % 400 === 0) {
+      console.log(((i + 1) / training.length) * 100 + " percent trained");
+    }
+  }
+}
+
+function guess(drawingData) {
+  if (drawingData.length === 0) {
+    console.log("You haven't drawn anything!");
+    return false;
+  }
+  let guess = nn.predict(drawingData);
+  let m = Math.max(...guess);
+  let classification = guess.indexOf(m);
+  switch (classification) {
+    case (0): console.log("Mushroom");
+    break;
+    case (1): console.log("Helicopter");
+    break;
+    case (2): console.log("Octopus");
+    break;
+    case (3): console.log("Penguin");
+    break;
+    case (4): console.log("Snail");
+    break;
+    default: console.log("Switch broke!")
   }
 }
 
@@ -142,7 +179,6 @@ function shuffle(array) {
   }
   return array;
 }
-
 
 function loadBytes(file) {
   let data = {};
