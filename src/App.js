@@ -7,6 +7,7 @@ import penguin1000 from "./doodles/penguin10000.bin";
 import snail1000 from "./doodles/snail10000.bin";
 import NeuralNetwork from "./neuralNet";
 import Canvas from "./Canvas";
+import * as ml5 from "ml5";
 
 const MUSHROOM = 0;
 const HELICOPTER = 1;
@@ -121,7 +122,7 @@ function trainingGeneration(training) {
     targets[label] = 1;
     nn.train(inputs, targets);
     if ((i + 1) % 400 === 0) {
-      console.log(((i + 1) / training.length) * 100 + " percent trained");
+      console.log(Math.floor(((i + 1) / training.length) * 100) + " percent trained");
     }
   }
 }
@@ -164,7 +165,7 @@ function testAll(testing) {
     }
   }
   let percent = correct / testing.length;
-  console.log(percent + " percent correct");
+  console.log(percent*100 + " percent correct");
 }
 
 function shuffle(array) {
@@ -211,5 +212,7 @@ const prepareData = (category, data, label) => {
     }
   }
 };
+
+
 
 export default App;

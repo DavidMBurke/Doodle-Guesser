@@ -18,7 +18,7 @@ export default function Canvas(params) {
     context.scale(1, 1);
     context.lineCap = "butt";
     context.strokeStyle = "black";
-    context.lineWidth = 10;
+    context.lineWidth = 12;
     contextRef.current = context;
     clearCanvas(contextRef.current);
   }, []);
