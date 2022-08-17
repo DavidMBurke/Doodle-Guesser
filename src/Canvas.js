@@ -46,29 +46,35 @@ export default function Canvas(params) {
   };
 
   return (
-    <div>
-      <canvas
+    <div className="column">
+      <div className="row">
+      <canvas 
         onMouseDown={startDrawing}
         onMouseUp={finishDrawing}
         onMouseMove={draw}
         id="learningCanvas"
         ref={canvasRef}
       />
+      </div>
+      <div className="column">
+      <div className="row">
       <button onClick={() => clearCanvas(contextRef.current)}>
         {" "}
         Clear drawing
       </button>
       <button
-        onClick={() => sampleDrawings(params.training, contextRef.current)}
+        onClick={() => sampleDrawings(params.training, contextRef.current, params.setConsoleOut)}
       >
         {" "}
         Sample Drawings
       </button>
+      </div>
+      <div className="row">
       <button
         onClick={() => {
           singleDrawing(
             params.training[Math.floor(Math.random() * params.training.length)],
-            contextRef.current
+            contextRef.current, params.setConsoleOut
           );
           params.setDrawingData(mapPixels(contextRef.current));
         }}
@@ -79,13 +85,15 @@ export default function Canvas(params) {
       <button
         onClick={() => {
           let drawing = mapPixels(contextRef.current);
-          singleDrawing(drawing, contextRef.current);
+          singleDrawing(drawing, contextRef.current, params.setConsoleOut);
           params.setDrawingData(mapPixels(contextRef.current));
         }}
       >
         {" "}
-        Draw this Drawing
+        Pixelate Drawing
       </button>
+      </div>
+      </div>
     </div>
   );
 }
@@ -122,9 +130,10 @@ function mapPixels(canvas) {
   return drawingData;
 }
 
-const singleDrawing = (img, canvas) => {
-  if (!img.length) {
-    console.log("no data loaded!");
+const singleDrawing = (img, canvas, fn) => {
+  if (!img) {
+    console.log("No data loaded!");
+    fn("No data loaded!");
     return;
   }
   let o = 0;
@@ -139,17 +148,19 @@ const singleDrawing = (img, canvas) => {
   }
 };
 
-const sampleDrawings = (data, canvas) => {
+const sampleDrawings = (data, canvas, fn) => {
   if (!data.length) {
-    console.log("no data loaded!");
+    console.log("No data loaded!");
+    fn("No data loaded!")
     return;
   }
+
   for (let n = 0; n < 100; n++) {
     let o = 0;
     for (let i = 0; i < 28; i++) {
       for (let j = 0; j < 28; j++) {
         let val = 255 - data[n][o];
-        let y = i + (n / 10) * 28;
+        let y = i + Math.floor(n / 10) * 28;
         let x = j + (n % 10) * 28;
         drawPixel(`rgb(${val},${val},${val})`, canvas, x, y, 1);
         o++;
